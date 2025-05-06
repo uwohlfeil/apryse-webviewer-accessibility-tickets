@@ -14,6 +14,10 @@ WebViewer({
   const {documentViewer} = instance.Core;
   const accessibleReadingOrderManager = (documentViewer as any).getAccessibleReadingOrderManager() as Core.AccessibleReadingOrderManager; // eslint-disable-line  - Bug in TS Library
   
+  accessibleReadingOrderManager.addEventListener("accessibleReadingOrderModeStarted", () => {
+    console.log("accessibleReadingOrderModeStarted called");
+  });
+
   accessibleReadingOrderManager.addEventListener("accessibleReadingOrderModeReady", () => {
     console.log("accessibleReadingOrderModeReady called");
   });
