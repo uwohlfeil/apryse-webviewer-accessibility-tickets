@@ -6,7 +6,35 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 `
 const element = document.getElementById('viewer');
 
-WebViewer({
+const observer = new MutationObserver((mutationList, _observer) => {
+  mutationList.forEach((mutation) => {
+      mutation.addedNodes.forEach((addedNode => {
+          if (addedNode.nodeType === Node.ELEMENT_NODE) {
+              const addedElement = addedNode as HTMLElement;
+              if (addedElement.classList.contains("a11y-reader-container")) {
+                const pageContainer = addedElement.closest('.pageContainer') as HTMLElement;
+                console.log(`Page ${pageContainer.id.replace('pageContainer', '')}: layer added`);
+              }
+          }
+      }));
+      mutation.removedNodes.forEach(((removedNode) => {
+          const removedElement = removedNode as HTMLElement;
+          if (removedElement.classList.contains("a11y-reader-container")) {
+              const removedElement = removedNode as HTMLElement;
+              const contentNode = removedElement.querySelector(".a11y-reader-content");
+              const dataElement = contentNode!.getAttribute("data-element")!;
+
+              const reg = RegExp("a11y-reader-content-(.+)_.*", "i").exec(dataElement)!;
+              
+              console.info(`Page ${reg[1]}: layer removed`);
+          }
+      }));
+  });
+});
+
+
+
+WebViewer.Iframe({
   path: '/webviewer', 
   initialDoc: 'Well-Tagged-PDF-WTPDF-1.0.pdf',
   accessibleMode: true
@@ -21,4 +49,10 @@ WebViewer({
   accessibleReadingOrderManager.addEventListener("accessibleReadingOrderModeReady", () => {
     console.log("accessibleReadingOrderModeReady called");
   });
+
+  observer.observe(instance.UI.iframeWindow.document, { childList: true, subtree: true });
+  
+
+
+
 })
