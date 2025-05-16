@@ -32,16 +32,22 @@ const observer = new MutationObserver((mutationList, _observer) => {
   });
 });
 
-
-
 WebViewer.Iframe({
-  path: '/webviewer', 
+  path: '/webviewer/', 
   initialDoc: 'Well-Tagged-PDF-WTPDF-1.0.pdf',
-  accessibleMode: true
+  accessibleMode: false,
+  disableVirtualDisplayMode: true,
+
+  fullAPI: true  
 }, element!).then((instance) => {
   const {documentViewer} = instance.Core;
   const accessibleReadingOrderManager = (documentViewer as any).getAccessibleReadingOrderManager() as Core.AccessibleReadingOrderManager; // eslint-disable-line  - Bug in TS Library
   
+  instance.UI.hotkeys.on('ctrl+alt+a', e => {
+    e.preventDefault();
+    instance.Core.documentViewer.getAccessibleReadingOrderManager().startAccessibleReadingOrderMode();
+  });
+
   accessibleReadingOrderManager.addEventListener("accessibleReadingOrderModeStarted", () => {
     console.log("accessibleReadingOrderModeStarted called");
   });
